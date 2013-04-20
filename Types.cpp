@@ -3,7 +3,10 @@
 
 using namespace Asteroids;
 
-Point Point::rotate(double angle)
+Point Point::rotate(double angle, Point center) const
 {
-  return Point(x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle));
+  Point point(x - center.x, y - center.y);
+
+  return Point(center.x + point.x * cos(angle) - point.y * sin(angle), 
+	       center.y + point.y * cos(angle) + point.x * sin(angle));
 }

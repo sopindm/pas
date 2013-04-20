@@ -8,6 +8,20 @@ Render::Render(int width, int height): _width(width), _height(height)
 {
 }
 
+float Render::width() const
+{
+  Point max(fromScreenSpace(Point(_width, _height)));
+
+  return max.x;
+}
+
+float Render::height() const
+{
+  Point max(fromScreenSpace(Point(_width, _height)));
+
+  return max.y;
+}
+
 void Render::setup()
 {
   glewInit();
@@ -82,18 +96,31 @@ void Render::unbind()
   glfwSwapBuffers();
 }
 
-Point Render::toScreenSpace(Point point)
+Point Render::toGLSpace(Point point) const
 {
-  int size = std::min(_width, _height);
+  float size = static_cast<float>(std::min(_width, _height));
 
-  float identity = static_cast<float>(size) / screenSize * 2;
+  float identity = size / screenSize * 2;
 
   return Point(point.x * identity / _width, point.y * identity / _height);
 }
 
+Point Render::fromScreenSpace(Point point) const
+{
+  float xSize = static_cast<float>(_width);
+  float ySize = static_cast<float>(_height);
+
+  float size = std::min(xSize, ySize);
+
+  float identity = size / screenSize;
+
+  return Point((point.x - xSize / 2) / identity,
+	       (point.y - ySize /2) / identity);
+}
+
 void Render::setVertex(Point point)
 {
-  point = toScreenSpace(point);
+  point = toGLSpace(point);
 
   glVertex3f(point.x, point.y, -1);
 }

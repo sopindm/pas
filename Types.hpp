@@ -7,7 +7,7 @@ namespace Asteroids
   {
     Point(float pX, float pY): x(pX), y(pY) {};
 
-    Point rotate(double angle);
+    Point rotate(double angle, Point center) const;
 
     float x;
     float y;

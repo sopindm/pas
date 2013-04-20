@@ -9,8 +9,11 @@ namespace Asteroids
   class Render
   {
   public:
-    Render(int width, int height);
+    Render(int screenWidth, int screenHeight);
   
+    float width() const;
+    float height() const;
+
     void setup();
     void release();
 
@@ -36,12 +39,13 @@ namespace Asteroids
   
     void drawNAngle(Color color, std::vector<Point> vertices);
 
-    static const int screenSize = 240;
+    static const int screenSize = 120;
 
-    Point toScreenSpace(Point p);
-    Point fromScreenSpace(Point p);
+    Point fromScreenSpace(Point p) const;//Converts point from screen space ([0;width], [0;height]) to game space ((-screenSize, screenSize
 
   private:
+    Point toGLSpace(Point p) const;
+
     void setVertex(Point point);
 
     int _width;
