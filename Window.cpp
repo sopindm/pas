@@ -50,6 +50,11 @@ void Window::handleKey(int key)
     _loop->onExit();
 }
 
+void Window::handleEvent()
+{
+  _loop->onPaint();
+}
+
 void Asteroids::mouseHandler(int button, int state)
 {
   int x, y;

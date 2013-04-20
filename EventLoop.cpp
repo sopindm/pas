@@ -62,6 +62,6 @@ void EventLoop::run()
 {
   while(!_done)
   {
-    onPaint();
+    _window.handleEvent();
   }
 }

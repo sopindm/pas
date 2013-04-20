@@ -14,6 +14,8 @@ namespace Asteroids
     int width() const;
     int height() const;
 
+    void handleEvent();
+
   private:
     void handleTap(int x, int y);
     void handleKey(int key);
