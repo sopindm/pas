@@ -4,8 +4,8 @@
 
 using namespace Asteroids;
 
-const int width = 800;
-const int height = 300;
+const int width = 1000;
+const int height = 1000;
 
 Window* _window;
 
@@ -41,13 +41,19 @@ void Window::handleTap(int x, int y)
   glfwGetDesktopMode( &vidMode );
 
   y = vidMode.Height - y;
-  _loop->onClick(x, y);
+  _loop->onTap(x, y);
 }
 
 void Window::handleKey(int key)
 {
   if(key == GLFW_KEY_ESC)
     _loop->onExit();
+
+  if(key == GLFW_KEY_F5)
+    _loop->onDeactivation();
+
+  if(key == GLFW_KEY_F9)
+    _loop->onActivation();
 }
 
 void Window::handleEvent()

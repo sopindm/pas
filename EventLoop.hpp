@@ -3,8 +3,9 @@
 
 #include <memory>
 #include "Render.hpp"
-#include "Objects.hpp"
+#include "Game.hpp"
 #include "Window.hpp"
+#include "Timer.hpp"
 
 namespace Asteroids
 {
@@ -20,14 +21,22 @@ namespace Asteroids
   private:
     friend class Window;
 
-    void onClick(int x, int y);
+    void onTap(int x, int y);
     void onPaint();
+
+    void onActivation();
+    void onDeactivation();
+
     void onExit();
 
     Window _window;
     std::auto_ptr<Render> _render;
-    Ship _ship;
 
+    Game _game;
+
+    Timer _timer;
+
+    bool _active;
     bool _done;
 
   };
