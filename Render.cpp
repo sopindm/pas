@@ -1,10 +1,17 @@
-#include <GL/glew.h>
-#include <GL/glfw.h>
+#include <GLES/gl.h>
+#include <GLES/glext.h>
+#include <algorithm>
 #include "Render.hpp"
 
 using namespace Asteroids;
 
-Render::Render(int width, int height): _width(width), _height(height)
+Render::Render(android_app* app):
+		_app(app),
+		_width(0),
+		_height(0),
+		_display(EGL_NO_DISPLAY),
+		_context(EGL_NO_CONTEXT),
+		_surface(EGL_NO_SURFACE)
 {
 }
 
@@ -22,9 +29,43 @@ float Render::height() const
   return max.y;
 }
 
+void Render::setupWindow()
+{
+	if(_display != EGL_NO_DISPLAY)
+		return;
+
+	const EGLint attributes[] = {EGL_RENDERABLE_TYPE,
+				                 EGL_OPENGL_ES_BIT,
+				                 EGL_BLUE_SIZE, 5,
+				                 EGL_GREEN_SIZE, 6,
+				                 EGL_RED_SIZE, 5,
+				                 EGL_SURFACE_TYPE,
+				                 EGL_WINDOW_BIT,
+				                 EGL_NONE};
+
+	_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	eglInitialize(_display, NULL, NULL);
+
+	EGLConfig config;
+	EGLint numConfigs;
+	eglChooseConfig(_display, attributes, &config, 1, &numConfigs);
+
+	EGLint format;
+	eglGetConfigAttrib(_display, config, EGL_NATIVE_VISUAL_ID, &format);
+	ANativeWindow_setBuffersGeometry(_app->window, 0, 0, format);
+
+	_surface = eglCreateWindowSurface(_display, config, _app->window, NULL);
+	_context = eglCreateContext(_display, config, EGL_NO_CONTEXT, NULL);
+
+	eglMakeCurrent(_display, _surface, _surface, _context);
+	eglQuerySurface(_display, _surface, EGL_WIDTH, &_width);
+	eglQuerySurface(_display, _surface, EGL_HEIGHT, &_height);
+}
+
 void Render::setup()
 {
-  glewInit();
+	setupWindow();
+
   glViewport(0, 0, _width, _height);
 
   glMatrixMode (GL_MODELVIEW);
@@ -34,10 +75,31 @@ void Render::setup()
   glLoadIdentity ();
 
   glBlendFunc(GL_ZERO, GL_ONE);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
 }
 
 void Render::release()
 {
+	if(_display == EGL_NO_DISPLAY)
+		return;
+
+	eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+	if(_context != EGL_NO_CONTEXT)
+	{
+		eglDestroyContext(_display, _context);
+		_context = EGL_NO_CONTEXT;
+	}
+
+	if(_surface != EGL_NO_SURFACE)
+	{
+		eglDestroySurface(_display, _surface);
+		_surface = EGL_NO_SURFACE;
+	}
+
+	eglTerminate(_display);
+	_display = EGL_NO_DISPLAY;
 }
 
 void Render::resize(int newWidth, int newHeight)
@@ -84,7 +146,7 @@ Render::_RGBColor Render::toRGB(Color color)
 void Render::setColor(Color color)
 {
   _RGBColor rgb = toRGB(color);
-  glColor3f(rgb.r, rgb.g, rgb.b);
+  glColor4f(rgb.r, rgb.g, rgb.b, 1);
 }
 
 void Render::bind()
@@ -93,7 +155,7 @@ void Render::bind()
 
 void Render::unbind()
 {
-  glfwSwapBuffers();
+  eglSwapBuffers(_display, _surface);
 }
 
 Point Render::toGLSpace(Point point) const
@@ -118,64 +180,57 @@ Point Render::fromScreenSpace(Point point) const
 	       (point.y - ySize /2) / identity);
 }
 
-void Render::setVertex(Point point)
+void drawBuffer(GLenum mode, void* buffer, size_t size)
 {
-  point = toGLSpace(point);
-
-  glVertex3f(point.x, point.y, -1);
+	glVertexPointer(3, GL_FLOAT, 0, buffer);
+	//glEnableVertexAttribArray(0);
+	glDrawArrays(mode, 0, size);
 }
 
 void Render::drawLine(Color color, Point p1, Point p2)
 {
-  glBegin(GL_LINES);
-
   setColor(color);
 
-  setVertex(p1);
-  setVertex(p2);
+  p1 = toGLSpace(p1);
+  p2 = toGLSpace(p2);
 
-  glEnd();
+  GLfloat vertices[] = {p1.x, p1.y, -1, p2.x, p2.y, -1};
+  drawBuffer(GL_LINES, vertices, 2);
 }
 
 void Render::drawTriangle(Color color, Point p1, Point p2, Point p3)
 {
-  glBegin(GL_TRIANGLES);
-
   setColor(color);
 
-  setVertex(p1);
-  setVertex(p2);
-  setVertex(p3);
+  p1 = toGLSpace(p1);
+  p2 = toGLSpace(p2);
+  p3 = toGLSpace(p3);
 
-  glEnd();
+  GLfloat vertices[] = {p1.x, p1.y, -1, p2.x, p2.y, -1, p3.x, p3.y, -1};
+  drawBuffer(GL_TRIANGLES, vertices, 3);
 }
 
 void Render::drawQuad(Color color, Point p1, Point p2, Point p3, Point p4)
 {
-  glBegin(GL_QUADS);
-
-  setColor(color);
-
-  setVertex(p1);
-  setVertex(p2);
-  setVertex(p3);
-  setVertex(p4);
-
-  glEnd();
+  drawTriangle(color, p1, p2, p3);
+  drawTriangle(color, p1, p3, p4);
 }
 
 void Render::drawNAngle(Color color, std::vector<Point> vertices)
 {
   setColor(color);
 
-  glBegin(GL_TRIANGLES);
-
+  std::vector<float> screenVertices;
   for(int i=0;i<vertices.size()-2;i++)
   {
-    setVertex(vertices[0]);
-    setVertex(vertices[i+1]);
-    setVertex(vertices[i+2]);
+	  for(int j=i;j<i+3;j++)
+	  {
+		  Point point = toGLSpace(vertices[j]);
+		  screenVertices.push_back(point.x);
+		  screenVertices.push_back(point.y);
+		  screenVertices.push_back(-1);
+	  }
   }
 
-  glEnd();
+  drawBuffer(GL_TRIANGLES, &screenVertices[0], (vertices.size() - 2) * 3);
 }

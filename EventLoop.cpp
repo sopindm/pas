@@ -1,34 +1,28 @@
-#include <GL/glfw.h>
-#include <cmath>
+//#include <cmath>
+#include <unistd.h>
+#include "Logger.hpp"
 #include "EventLoop.hpp"
 
 using namespace Asteroids;
 
-EventLoop* _loop;
-
-EventLoop::EventLoop()
+EventLoop::EventLoop(android_app* app): _window(app), _render(app)
 {
-  _loop = this;
-  _done = false;
 }
 
 EventLoop::~EventLoop()
 {
-  _render->release();
-  glfwTerminate();
+  _render.release();
+  _window.release();
 }
 
 void EventLoop::setup()
 {
   _window.setup(this);
-
-  _render.reset(new Render(_window.width(), _window.height()));
-  _render->setup();
 }
 
-void EventLoop::onClick(int x, int y)
+void EventLoop::onTap(int x, int y)
 {
-  Point click(_render->fromScreenSpace(Point(x, y)));
+  Point click(_render.fromScreenSpace(Point(x, y)));
 
   click.y = click.y - _ship.center().y;
   click.x = click.x - _ship.center().x;
@@ -39,29 +33,37 @@ void EventLoop::onClick(int x, int y)
 
 void EventLoop::onPaint()
 {
-  _render->bind();
+  _render.bind();
 
-  _render->clear(Render::WHITE);
+  _render.clear(Render::WHITE);
   
-  _render->drawQuad(Render::BLACK, 
-		    Point(-_render->width(), -_render->height()),
-		    Point(-_render->width(), _render->height()),
-		    Point(_render->width(), _render->height()), 
-		    Point(_render->width(), -_render->height()));
+  _render.drawQuad(Render::BLACK,
+		    Point(-_render.width(), -_render.height()),
+		    Point(-_render.width(), _render.height()),
+		    Point(_render.width(), _render.height()),
+		    Point(_render.width(), -_render.height()));
 
-  _ship.draw(*_render);
-  _render->unbind();
+  _ship.draw(_render);
+  _render.unbind();
 }
 
-void EventLoop::onExit()
+void EventLoop::onActivate()
 {
-  _done = true;
+	_render.setup();
+}
+
+void EventLoop::onDeactivate()
+{
+	_render.release();
 }
 
 void EventLoop::run()
 {
-  while(!_done)
-  {
-    _window.handleEvent();
-  }
+	app_dummy();
+
+	while(true)
+	{
+		if(_window.handleEvent())
+			break;
+	}
 }

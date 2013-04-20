@@ -2,6 +2,8 @@
 #define ASTEROIDS_RENDER_HPP
 
 #include <vector>
+#include <android_native_app_glue.h>
+#include <EGL/egl.h>
 #include "Types.hpp"
 
 namespace Asteroids
@@ -9,7 +11,7 @@ namespace Asteroids
   class Render
   {
   public:
-    Render(int screenWidth, int screenHeight);
+    Render(android_app* app);
   
     float width() const;
     float height() const;
@@ -39,14 +41,18 @@ namespace Asteroids
   
     void drawNAngle(Color color, std::vector<Point> vertices);
 
-    static const int screenSize = 120;
+    static const int screenSize = 60;
 
     Point fromScreenSpace(Point p) const;//Converts point from screen space ([0;width], [0;height]) to game space ((-screenSize, screenSize
 
   private:
+    void setupWindow();
+
     Point toGLSpace(Point p) const;
 
     void setVertex(Point point);
+
+    android_app* _app;
 
     int _width;
     int _height;
@@ -60,6 +66,11 @@ namespace Asteroids
   
     _RGBColor toRGB(Color color);
     void setColor(Color color);
+
+    EGLDisplay _display;
+    EGLSurface _surface;
+    EGLContext _context;
+
   };
 }
 #endif

@@ -1,14 +1,10 @@
 #include "EventLoop.hpp"
 
-#include <iostream>
-
-int main ( int argc, char * argv[] )
+void android_main(android_app* app)
 {
-  Asteroids::EventLoop loop;
+  Asteroids::EventLoop loop(app);
   loop.setup();
 
   loop.run();
-
-  return 0;
 }
 
