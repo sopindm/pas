@@ -5,22 +5,12 @@ using namespace Asteroids;
 
 const double PI = 3.14159;
 
-Object::Object(): _isPersistent(true), 
-		  _lifeTime(-1),
+Object::Object(): _lifeTime(-1),
 		  _center(Point(0, 0)),
+		  _radius(0),
 		  _direction(0),
 		  _speed(0)
 {
-}
-
-bool Object::isPersistent() const
-{
-  return _isPersistent;
-}
-
-void Object::setPersistent(bool value)
-{
-  _isPersistent = value;
 }
 
 double Object::lifeTime() const
@@ -43,6 +33,16 @@ void Object::setCenter(Point center)
   _center = center;
 }
 
+double Object::radius() const
+{
+  return _radius;
+}
+
+void Object::setRadius(double radius)
+{
+  _radius = radius;
+}
+
 double Object::direction() const
 {
   return _direction;
@@ -63,9 +63,20 @@ void Object::setSpeed(double speed)
   _speed = speed;
 }
 
+bool Object::intersect(const Object& object, const Timer& timer, bool continuous) const
+{
+  double range = (center() - object.center()).magnitude();
+
+  double minRange = radius() + object.radius();
+  if(continuous)
+    minRange += speed() * timer.elapsed();
+
+  return range <= minRange;
+}
+
 bool Object::update(const Timer& timer, int width, int height)
 {
-  if(!_isPersistent)
+  if(_lifeTime >= 0)
     _lifeTime -= timer.elapsed();
 
   _center += (Vector(0, 1) * _speed * timer.elapsed()).rotate(_direction);
@@ -85,9 +96,9 @@ bool Object::update(const Timer& timer, int width, int height)
 
 Ship::Ship(): Object()
 {
-  setPersistent(true);
   setLifeTime(-1);
   setCenter(Point(0, 1));
+  setRadius(3);
   setDirection(0);
   setSpeed(0);
 }
@@ -123,14 +134,13 @@ void Ship::draw(Render& render)
 
 Shoot::Shoot()
 {
-  setPersistent(false);
 }
 
 Shoot::Shoot(const Ship& ship)
 {
-  setPersistent(false);
   setLifeTime(_lifeTime);
   setCenter(ship.nose());
+  setRadius(1);
   setDirection(ship.direction());
   setSpeed(_speed);
 }
@@ -140,13 +150,30 @@ void Shoot::draw(Render& render)
   render.drawLine(Render::RED, center(), center() + Vector(0, 1).rotate(direction()));
 }
 
+bool Shoot::intersect(const Asteroid& asteroid, const Timer& timer) const
+{
+  if(!Object::intersect(asteroid, timer, true))
+    return false;
+
+  Point nose = center() + (Vector(0, 1) * (1 + speed() * timer.elapsed())).rotate(direction());
+
+  Line shoot(center(), nose);
+
+  for(int i=0;i<asteroid.lines();i++)
+  {
+    if(shoot.intersect(asteroid.line(i)))
+      return true;
+  }
+
+  return false;
+}
+
 Asteroid::Asteroid()
 {
 }
 
 Asteroid::Asteroid(int width, int height)
 {
-  setPersistent(false);
   setLifeTime(5);
 
   generatePosition(width, height);
@@ -178,6 +205,8 @@ void Asteroid::generateForm()
   int n = Random::nextInt(7, 15);
 
   float radius = Random::nextFloat(5, 8);
+  setRadius(radius);
+
   float dAngle = .25 / n * 2 * PI; //angle dispersion
   float dRadius = radius * 0.1; //radius dispersion
 
@@ -198,11 +227,22 @@ void Asteroid::draw(Render& render)
     points[i] += center();
 
   render.drawNAngle(Render::GRAY, points);
+}
 
-/*
-  render.drawQuad(Render::GRAY, 
-		  center() + Vector(-3, -3), 
-		  center() + Vector(-3, 3), 
-		  center() + Vector(3, 3), 
-		  center() + Vector(3, -3));*/
+int Asteroid::lines() const
+{
+  return _points.size();
+}
+
+Line Asteroid::line(int index) const
+{
+  Point start(center() + _points[index]);
+
+  index++;
+  if(index == _points.size())
+    index = 0;
+
+  Point finish(center() + _points[index]);
+
+  return Line(start, finish);
 }

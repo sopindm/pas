@@ -16,7 +16,7 @@ void Game::setup(int width, int height)
 
 void Game::setupAsteroids(int width, int height)
 {
-  for(int i=0; i<3;i++)
+  for(int i=0; i<10;i++)
     _asteroids.push_back(Asteroid(width, height));
 }
 
@@ -51,24 +51,55 @@ void Game::gravity(Vector g)
   _moveTimer.reset();
 } 
 
+void Game::removeShoot(int index)
+{
+  _shoots[index] = _shoots[_shoots.size() - 1];
+  _shoots.resize(_shoots.size() - 1);
+}
+
+void Game::removeAsteroid(int index)
+{
+  _asteroids[index] = _asteroids[_asteroids.size() - 1];
+  _asteroids.resize(_asteroids.size() - 1);
+}
+
 void Game::update(Timer& timer, int width, int height)
 {
-  _ship.update(timer, width, height);
+  updateAsteroids(timer, width, height);
+  collideShoots(timer);
+  updateShoots(timer, width, height);
 
+  _ship.update(timer, width, height);
+}
+
+void Game::updateAsteroids(Timer& timer, int width, int height)
+{
   for(int i=0;i<_asteroids.size();i++)
   {
-    if(!_asteroids[i].update(timer, width, height))
-    {
-      _asteroids[i] = Asteroid(width, height);
-    }
+    _asteroids[i].update(timer, width, height);
   }
+}
 
+void Game::collideShoots(Timer& timer)
+{
+  for(int i=0;i<_shoots.size();i++)
+    for(int j=0;j<_asteroids.size();j++)
+      if(_shoots[i].intersect(_asteroids[j], timer))
+      {
+	removeShoot(i);
+	removeAsteroid(j);
+	i--;
+	break;
+      }
+}
+
+void Game::updateShoots(Timer& timer, int width, int height)
+{
   for(int i=0;i<_shoots.size();i++)
   {
     if(!_shoots[i].update(timer, width, height))
     {
-      _shoots[i] = _shoots[_shoots.size() - 1];
-      _shoots.resize(_shoots.size() - 1);
+      removeShoot(i);
       i--;
     }
   }

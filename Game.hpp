@@ -22,7 +22,15 @@ namespace Asteroids
   private:
     void setupAsteroids(int width, int height);
 
-    const static float shootDelay = 0.5;
+    void removeShoot(int index);
+    void removeAsteroid(int index);
+
+    void updateAsteroids(Timer& timer, int width, int height);
+    void updateShoots(Timer& timer, int width, int height);
+
+    void collideShoots(Timer& timer);
+
+    const static float shootDelay = 0.01;
     const static float moveDelay = 0.5;
 
     Ship _ship;

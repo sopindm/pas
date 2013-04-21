@@ -12,32 +12,33 @@ namespace Asteroids
   public:
     Object();
 
-    bool isPersistent() const;
     double lifeTime() const;
 
     Point center() const;
-    //virtual double radius() const = 0;
+    double radius() const;
 
     double direction() const;
     double speed() const;
 
     virtual bool update(const Timer& timer, int width, int height);
+    virtual bool intersect(const Object& object, const Timer& timer, bool continuous = false) const;
+
     virtual void draw(Render& render) = 0;
 
   protected:
-    void setPersistent(bool value);
     void setLifeTime(double newLifeTime);
 
-    void setCenter(Point newCenter);
+    void setCenter(Point center);
+    void setRadius(double radius);
 
     void setDirection(double newDirection);
     void setSpeed(double newSpeed);
 
   private:
-    bool _isPersistent;
     double _lifeTime;
 
     Point _center;
+    double _radius;
 
     double _direction;
     double _speed;
@@ -58,20 +59,6 @@ namespace Asteroids
 
   };
 
-  class Shoot: public Object
-  {
-  public:
-    Shoot();
-    Shoot(const Ship& ship);
-
-    void draw(Render& render);
-
-  private:
-    static const float _lifeTime = 1;
-    static const float _speed = 60;
-
-  };
-
   class Asteroid: public Object
   {
   public:
@@ -80,12 +67,31 @@ namespace Asteroids
 
     void draw(Render& render);
 
+    int lines() const;
+    Line line(int index) const;
+
   private:
     void generatePosition(int width, int height);
     void generateSpeed();
     void generateForm();
 
     std::vector<Point> _points;
+
+  };
+
+  class Shoot: public Object
+  {
+  public:
+    Shoot();
+    Shoot(const Ship& ship);
+
+    void draw(Render& render);
+
+    bool intersect(const Asteroid& asteroid, const Timer& timer) const;
+
+  private:
+    static const float _lifeTime = 1;
+    static const float _speed = 60;
 
   };
 }

@@ -29,5 +29,19 @@ namespace Asteroids
   };
 
   typedef Point Vector;
+
+  class Line
+  {
+  public:
+    Line();
+    Line(Point p1, Point p2);
+    
+    bool intersect(const Line& line) const;
+
+  private:
+    Point _start;
+    Point _finish;
+
+  };
 }
 #endif
