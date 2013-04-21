@@ -24,6 +24,21 @@ void Timer::reset()
   start();
 }
 
+bool Timer::isWorking() const
+{
+   return _state == WORKING;
+}
+
+bool Timer::isStopped() const
+{
+   return _state == STOPPED;
+}
+
+bool Timer::isPaused() const
+{
+   return _state == PAUSED;
+}
+
 double Timer::elapsed() const
 {
   if(_state != WORKING)

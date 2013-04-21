@@ -20,7 +20,7 @@ void EventLoop::setup()
 
 void EventLoop::onTap(int x, int y)
 {
-  Point tap(_render->fromScreenSpace(Point(x, y)));
+  Point tap(_render.fromScreenSpace(Point(x, y)));
 
   _game.tap(tap);
 }
@@ -31,10 +31,10 @@ void EventLoop::onPaint()
 
   if(_active && _timer.elapsed() >= 0.012)
   {
-    _render->clear(Render::BLACK);
+    _render.clear(Render::BLACK);
 
-    _game.update(_timer, _render->width(), _render->height());
-    _game.draw(*_render);
+    _game.update(_timer, _render.width(), _render.height());
+    _game.draw(_render);
 
     _timer.reset();
   }

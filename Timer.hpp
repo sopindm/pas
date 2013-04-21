@@ -17,6 +17,10 @@ namespace Asteroids
     void pause();
     void resume();
 
+    bool isPaused() const;
+    bool isWorking() const;
+    bool isStopped() const;
+
   private:
     static double _getTime();
 
