@@ -22,6 +22,7 @@ namespace Asteroids
     friend class Window;
 
     void onTap(int x, int y);
+    void onGravity(float x, float y);
     void onPaint();
 
     void onActivation();

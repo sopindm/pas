@@ -17,6 +17,9 @@ namespace Asteroids
     void handleEvent();
 
   private:
+    bool holdKey(int key);
+
+    void handleGravity();
     void handleTap(int x, int y);
     void handleKey(int key);
 

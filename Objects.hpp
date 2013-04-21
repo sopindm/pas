@@ -43,22 +43,18 @@ namespace Asteroids
 
   };
 
-  class Ship
+  class Ship: public Object
   {
   public:
     Ship();
 
-    Point center() const;
     Point nose() const;
 
-    double direction() const;
-    void setDirection(double newAngle);
+    void setDirection(double newDirection);
+    void setSpeed(double newSpeed);
 
     void draw(Render& render);
 
-  private:
-    double _direction;
-    
   };
 
   class Shoot: public Object
@@ -67,8 +63,11 @@ namespace Asteroids
     Shoot();
     Shoot(const Ship& ship);
 
-    //void update(const Timer& timer, int width, int height);
     void draw(Render& render);
+
+  private:
+    static const float _lifeTime = 1;
+    static const float _speed = 60;
 
   };
 }

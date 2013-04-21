@@ -3,12 +3,9 @@
 
 using namespace Asteroids;
 
-Point Point::rotate(double angle, Point center) const
+float Point::magnitude() const
 {
-  Point point(x - center.x, y - center.y);
-
-  return Point(center.x + point.x * cos(angle) - point.y * sin(angle), 
-	       center.y + point.y * cos(angle) + point.x * sin(angle));
+  return sqrt(x * x + y * y);
 }
 
 Point Point::operator+(const Point& point) const
@@ -38,8 +35,23 @@ Point Point::operator*(double value) const
   return Point(x * value, y * value);
 }
 
+double Point::angle()
+{
+  return atan2(-x, y);
+}
+
 double Point::angle(Point base)
 {
-  Point point(*this - base);
-  return atan2(-point.x, point.y);
+  return (*this - base).angle();
+}
+
+Point Point::rotate(double angle) const
+{
+  return Point(x * cos(angle) - y * sin(angle), 
+	       y * cos(angle) + x * sin(angle));
+}
+
+Point Point::rotate(double angle, Point center) const
+{
+  return (*this - center).rotate(angle);
 }

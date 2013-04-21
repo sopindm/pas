@@ -56,8 +56,34 @@ void Window::handleKey(int key)
     _loop->onActivation();
 }
 
+bool Window::holdKey(int key)
+{
+  return glfwGetKey(key) == GLFW_PRESS;
+}
+
+void Window::handleGravity()
+{
+  float gX = 0;
+  float gY = 0;
+
+  if(holdKey(GLFW_KEY_UP))
+    gY += 0.5;
+
+  if(holdKey(GLFW_KEY_DOWN))
+    gY -= 0.5;
+
+  if(holdKey(GLFW_KEY_RIGHT))
+    gX += 0.5;
+
+  if(holdKey(GLFW_KEY_LEFT))
+    gX -= 0.5;
+
+  _loop->onGravity(gX, gY);
+}
+
 void Window::handleEvent()
 {
+  handleGravity();
   _loop->onPaint();
 }
 
