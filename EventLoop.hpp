@@ -3,8 +3,9 @@
 
 #include <android_native_app_glue.h>
 #include "Render.hpp"
-#include "Objects.hpp"
+#include "Game.hpp"
 #include "Window.hpp"
+#include "Timer.hpp"
 
 namespace Asteroids
 {
@@ -44,6 +45,10 @@ namespace Asteroids
     Window _window;
     Render _render;
     Ship _ship;
+
+    Game _game;
+    Timer _timer;
+    bool _active;
 
   };
 }

@@ -7,5 +7,5 @@ include(${GLEW_INCLUDE_DIR})
 
 find_package( OpenGL REQUIRED)
 
-add_executable(Asteroids main.cpp Render.cpp Types.cpp EventLoop.cpp Objects.cpp Window.cpp)
-target_link_libraries(Asteroids ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} glfw)
+add_executable(Asteroids main.cpp Render.cpp Types.cpp EventLoop.cpp Objects.cpp Window.cpp Timer.cpp Game.cpp)
+target_link_libraries(Asteroids ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} glfw rt)

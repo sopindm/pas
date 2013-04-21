@@ -1,11 +1,9 @@
-//#include <cmath>
-#include <unistd.h>
 #include "Logger.hpp"
 #include "EventLoop.hpp"
 
 using namespace Asteroids;
 
-EventLoop::EventLoop(android_app* app): _window(app), _render(app)
+EventLoop::EventLoop(android_app* app): _window(app), _render(app), _active(false)
 {
 }
 
@@ -22,39 +20,44 @@ void EventLoop::setup()
 
 void EventLoop::onTap(int x, int y)
 {
-  Point click(_render.fromScreenSpace(Point(x, y)));
+  Point tap(_render->fromScreenSpace(Point(x, y)));
 
-  click.y = click.y - _ship.center().y;
-  click.x = click.x - _ship.center().x;
-
-  double angle = atan2(-click.x, click.y); //In default state we a rotated at 90 degrees, so we need to rotate 90 degrees back
-  _ship.setAngle(angle);
+  _game.tap(tap);
 }
 
 void EventLoop::onPaint()
 {
   _render.bind();
 
-  _render.clear(Render::WHITE);
-  
-  _render.drawQuad(Render::BLACK,
-		    Point(-_render.width(), -_render.height()),
-		    Point(-_render.width(), _render.height()),
-		    Point(_render.width(), _render.height()),
-		    Point(_render.width(), -_render.height()));
+  if(_active && _timer.elapsed() >= 0.012)
+  {
+    _render->clear(Render::BLACK);
 
-  _ship.draw(_render);
+    _game.update(_timer, _render->width(), _render->height());
+    _game.draw(*_render);
+
+    _timer.reset();
+  }
+
   _render.unbind();
 }
 
 void EventLoop::onActivate()
 {
 	_render.setup();
+	
+	if(_timer.isPaused())
+	  _timer.resume();
+	else _timer.reset();
+
+	_active = true;	
 }
 
 void EventLoop::onDeactivate()
 {
+	_active = false;
 	_render.release();
+	_timer.pause();
 }
 
 void EventLoop::run()
