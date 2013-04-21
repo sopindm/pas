@@ -29,7 +29,7 @@ void Game::gravity(Vector g)
 
   float speed = 10 * g.magnitude();
 
-  if(speed > 1)
+  if(speed > 3)
   {
     _ship.setDirection(g.angle());
     _ship.setSpeed(speed);

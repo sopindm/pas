@@ -28,6 +28,8 @@ namespace Asteroids
     void onGravity(float x, float y);
     void onPaint();
 
+    void onExit();
+
     void onStart(){};
     void onResume(){};
     void onPause(){};

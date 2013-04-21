@@ -18,6 +18,11 @@ void EventLoop::setup()
   _window.setup(this);
 }
 
+void EventLoop::onExit()
+{
+  _window.destroy();
+}
+
 void EventLoop::onTap(int x, int y)
 {
   Point tap(_render.fromScreenSpace(Point(x, y)));
