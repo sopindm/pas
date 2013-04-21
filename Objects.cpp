@@ -132,6 +132,26 @@ void Ship::draw(Render& render)
 		      center() + Vector(-1, 0).rotate(direction()));
 }
 
+bool Ship::intersect(const Asteroid& asteroid, const Timer& timer) const
+{
+  if(!Object::intersect(asteroid, timer))
+    return false;
+
+  double deltaR = speed() * timer.elapsed();
+
+  Point nose = center() + Vector(0, 3 + deltaR).rotate(direction());
+  Point middleLeft = center() + Vector(-1, deltaR).rotate(direction());
+  Point middleRight = center() + Vector(1, deltaR).rotate(direction());
+  Point backLeft = center() + Vector(-1, -2).rotate(direction());
+  Point backRight = center() + Vector(1, -2).rotate(direction());
+
+  return asteroid.intersectLine(Line(nose, middleLeft)) ||
+    asteroid.intersectLine(Line(nose, middleRight)) ||
+    asteroid.intersectLine(Line(middleLeft, backLeft)) ||
+    asteroid.intersectLine(Line(middleRight, backRight)) ||
+    asteroid.intersectLine(Line(backLeft, backRight));
+}
+
 Shoot::Shoot()
 {
 }
@@ -155,56 +175,46 @@ bool Shoot::intersect(const Asteroid& asteroid, const Timer& timer) const
   if(!Object::intersect(asteroid, timer, true))
     return false;
 
-  Point nose = center() + (Vector(0, 1) * (1 + speed() * timer.elapsed())).rotate(direction());
+  Point nose = center() + Vector(0, 1 + speed() * timer.elapsed()).rotate(direction());
 
   Line shoot(center(), nose);
 
-  for(int i=0;i<asteroid.lines();i++)
-  {
-    if(shoot.intersect(asteroid.line(i)))
-      return true;
-  }
-
-  return false;
+  return asteroid.intersectLine(shoot);
 }
 
-Asteroid::Asteroid()
+Asteroid::Asteroid(): _size(0)
 {
 }
 
-Asteroid::Asteroid(int width, int height)
+Asteroid::Asteroid(int width, int height): _size(1)
 {
-  setLifeTime(5);
-
-  generatePosition(width, height);
-  generateSpeed();
-  generateForm();
+  generatePosition(-width, width, -height, height);
+  generateSpeed(defaultMinSpeed, defaultMaxSpeed, 0, 2 * PI);
+  generateForm(defaultMinRadius, defaultMaxRadius);
 }
 
-void Asteroid::generatePosition(int width, int height)
+void Asteroid::generatePosition(float minX, float maxX, float minY, float maxY, bool freeCenter)
 {
-  //Generating new asteroid position. Leaving screen center empty (for the ship)
+  Point center(Random::nextFloat(minX, maxX), Random::nextFloat(minY, maxY));
 
-  Point center(Random::nextFloat(-width, width), Random::nextFloat(-height, height));
-
-  if(center.magnitude() < 20)
-    center = Point(center.x / center.magnitude() * 20, center.y / center.magnitude() * 20);
+  if(freeCenter && center.magnitude() < 20)
+    center = center * (20.0 / center.magnitude());
 
   setCenter(center);
 }
 
-void Asteroid::generateSpeed()
+void Asteroid::generateSpeed(float minSpeed, float maxSpeed, float minAngle, float maxAngle)
 {
-  setDirection(Random::nextFloat(2 * PI));
-  setSpeed(Random::nextFloat(8, 10));
+  setDirection(Random::nextFloat(minAngle, maxAngle));
+  setSpeed(Random::nextFloat(minSpeed, maxSpeed));
 }
 
-void Asteroid::generateForm()
+void Asteroid::generateForm(float minRadius, float maxRadius)
 {
   _points.clear();
   int n = Random::nextInt(7, 15);
 
-  float radius = Random::nextFloat(5, 8);
+  float radius = Random::nextFloat(minRadius, maxRadius);
   setRadius(radius);
 
   float dAngle = .25 / n * 2 * PI; //angle dispersion
@@ -245,4 +255,49 @@ Line Asteroid::line(int index) const
   Point finish(center() + _points[index]);
 
   return Line(start, finish);
+}
+
+bool Asteroid::intersectLine(const Line& line) const
+{
+  for(int i=0;i<lines();i++)
+  {
+    if(line.intersect(this->line(i)))
+      return true;
+  }
+
+  return false;
+}
+
+int Asteroid::size() const
+{
+  return _size;
+}
+
+void Asteroid::divide(std::vector<Asteroid>& collection)
+{
+  int pieces = Random::nextInt(divisionMinPieces, divisionMaxPieces);
+
+  float startAngle = Random::nextFloat(0, 2 * PI);
+  float dAngle = .25 / pieces * 2 * PI; //angle dispersion
+  float dRadius = radius() * 0.03; //radius dispersion
+
+  for(int i=0;i<pieces;i++)
+  {
+    float angle = static_cast<float>(i) / pieces * 2 * PI;
+    angle += Random::nextFloat(-dAngle, dAngle);
+
+    float radius = this->radius() * 0.3 * (1 + Random::nextFloat(-dRadius, dRadius));
+
+    Asteroid newAsteroid;
+    newAsteroid._size = _size - 1;
+
+    Point position = center() + Vector(0, radius).rotate(angle);
+    newAsteroid.generatePosition(position.x, position.x, position.y, position.y);
+    newAsteroid.generateSpeed(defaultMinSpeed, defaultMaxSpeed, angle - dAngle, angle + dAngle);
+    newAsteroid.generateForm(radius, radius);
+
+    collection.push_back(newAsteroid);
+  }
+
+
 }
