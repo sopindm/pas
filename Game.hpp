@@ -11,6 +11,8 @@ namespace Asteroids
   public:
     Game();
 
+    void setup(int width, int height);
+
     void update(Timer& timer, int width, int height);
     void draw(Render& render);
 
@@ -18,11 +20,26 @@ namespace Asteroids
     void gravity(Vector gravity); 
 
   private:
-    const static float shootDelay = 0.5;
+    void reset(int width, int height, int level = 0);
+    int _level;
+
+    void setupAsteroids(int width, int height, int level);
+
+    void removeShoot(int index);
+    void removeAsteroid(int index);
+
+    void updateAsteroids(Timer& timer, int width, int height);
+    void updateShoots(Timer& timer, int width, int height);
+    bool updateShip(Timer& timer, int width, int height);
+
+    void collideShoots(Timer& timer);
+
+    const static float shootDelay = 0.3;
     const static float moveDelay = 0.5;
 
     Ship _ship;
     std::vector<Shoot> _shoots;
+    std::vector<Asteroid> _asteroids;
 
     Timer _shootTimer;
     Timer _moveTimer;

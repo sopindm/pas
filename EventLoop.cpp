@@ -53,6 +53,8 @@ void EventLoop::onPaint()
 
 void EventLoop::onActivate()
 {
+	_game.setup(_render->width(), _render->height());
+
 	_render.setup();
 	
 	if(_timer.isPaused())

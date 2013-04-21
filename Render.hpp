@@ -24,6 +24,7 @@ namespace Asteroids
     enum Color
     {
       BLACK,
+      GRAY,
       WHITE,
       RED,
       GREEN,
