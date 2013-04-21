@@ -65,7 +65,7 @@ bool Object::update(const Timer& timer, int width, int height)
   if(!_isPersistent)
     _lifeTime -= timer.elapsed();
 
-  _center += (Vector(0, 1) * _speed * timer.elapsed()).rotate(_direction, Point(0, 0));
+  _center += (Vector(0, 1) * _speed * timer.elapsed()).rotate(_direction);
 
   if(_center.x > width)
     _center.x = -width + (_center.x - width);
@@ -80,42 +80,42 @@ bool Object::update(const Timer& timer, int width, int height)
   return _lifeTime >= 0;
 }
 
-Ship::Ship(): _direction(0)
+Ship::Ship(): Object()
 {
-}
-
-Point Ship::center() const
-{
-  return Point(0,1);
+  setPersistent(true);
+  setLifeTime(-1);
+  setCenter(Point(0, 1));
+  setDirection(0);
+  setSpeed(0);
 }
 
 Point Ship::nose() const
 {
-  return Point(0, 4).rotate(_direction, center());
-}
-
-double Ship::direction() const
-{
-  return _direction;
+  return center() + Vector(0, 3).rotate(direction());
 }
 
 void Ship::setDirection(double direction)
 {
-  _direction = direction;
+  Object::setDirection(direction);
+}
+
+void Ship::setSpeed(double speed)
+{
+  Object::setSpeed(speed);
 }
 
 void Ship::draw(Render& render)
 {
   render.drawQuad(Render::WHITE, 
-		  Point(-1, -1).rotate(_direction, center()), 
-		  Point(-1, 1).rotate(_direction, center()), 
-		  Point(1, 1).rotate(_direction, center()), 
-		  Point(1, -1).rotate(_direction, center()));
+		  center() + Vector(-1, -2).rotate(direction()),
+		  center() + Vector(-1, 0).rotate(direction()),
+		  center() + Vector(1, 0).rotate(direction()),
+		  center() + Vector(1, -2).rotate(direction()));
 
   render.drawTriangle(Render::WHITE, 
-		      Point(1, 1).rotate(_direction, center()), 
-		      Point(0, 4).rotate(_direction, center()), 
-		      Point(-1, 1).rotate(_direction, center()));
+		      center() + Vector(1, 0).rotate(direction()),
+		      center() + Vector(0, 3).rotate(direction()),
+		      center() + Vector(-1, 0).rotate(direction()));
 }
 
 Shoot::Shoot()
@@ -126,34 +126,15 @@ Shoot::Shoot()
 Shoot::Shoot(const Ship& ship)
 {
   setPersistent(false);
-  setLifeTime(1);
+  setLifeTime(_lifeTime);
   setCenter(ship.nose());
   setDirection(ship.direction());
-  setSpeed(60);
+  setSpeed(_speed);
 }
 
 void Shoot::draw(Render& render)
 {
-  render.drawLine(Render::RED, center(), center() + Vector(0, 1).rotate(direction(), Point(0, 0)));
+  render.drawLine(Render::RED, center(), center() + Vector(0, 1).rotate(direction()));
 }
 
-/*
-void Shoot::update(const Timer& timer, int width, int height)
-{
-  Object::update(timer, width, height);
-
-  _lifeTime -= timer.elapsed();
-  _point = _point + (Vector(0, 60) * timer.elapsed()).rotate(_direction, Point(0, 0));
-
-  if(_point.x > width)
-    _point.x = -width + (_point.x - width);
-  if(_point.x < -width)
-    _point.x = width + (_point.x + width);
-
-  if(_point.y > height)
-    _point.y = -height + (_point.y - height);
-  if(_point.y < -height)
-    _point.y = height + (_point.y + height);
-}
-*/
 

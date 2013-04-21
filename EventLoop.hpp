@@ -25,6 +25,7 @@ namespace Asteroids
     void onDeactivate();
 
     void onTap(int x, int y);
+    void onGravity(float x, float y);
     void onPaint();
 
     void onStart(){};

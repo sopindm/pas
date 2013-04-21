@@ -15,10 +15,17 @@ namespace Asteroids
     void draw(Render& render);
 
     void tap(Point point);
+    void gravity(Vector gravity); 
 
   private:
+    const static float shootDelay = 0.5;
+    const static float moveDelay = 0.5;
+
     Ship _ship;
     std::vector<Shoot> _shoots;
+
+    Timer _shootTimer;
+    Timer _moveTimer;
 
   };
 }

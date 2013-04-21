@@ -21,8 +21,12 @@ void EventLoop::setup()
 void EventLoop::onTap(int x, int y)
 {
   Point tap(_render.fromScreenSpace(Point(x, y)));
-
   _game.tap(tap);
+}
+
+void EventLoop::onGravity(float x, float y)
+{
+  _game.gravity(Vector(x, y));
 }
 
 void EventLoop::onPaint()
