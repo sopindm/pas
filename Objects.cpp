@@ -1,6 +1,9 @@
+#include "Random.hpp"
 #include "Objects.hpp"
 
 using namespace Asteroids;
+
+const double PI = 3.14159;
 
 Object::Object(): _isPersistent(true), 
 		  _lifeTime(-1),
@@ -137,4 +140,69 @@ void Shoot::draw(Render& render)
   render.drawLine(Render::RED, center(), center() + Vector(0, 1).rotate(direction()));
 }
 
+Asteroid::Asteroid()
+{
+}
 
+Asteroid::Asteroid(int width, int height)
+{
+  setPersistent(false);
+  setLifeTime(5);
+
+  generatePosition(width, height);
+  generateSpeed();
+  generateForm();
+}
+
+void Asteroid::generatePosition(int width, int height)
+{
+  //Generating new asteroid position. Leaving screen center empty (for the ship)
+
+  Point center(Random::nextFloat(-width, width), Random::nextFloat(-height, height));
+
+  if(center.magnitude() < 20)
+    center = Point(center.x / center.magnitude() * 20, center.y / center.magnitude() * 20);
+
+  setCenter(center);
+}
+
+void Asteroid::generateSpeed()
+{
+  setDirection(Random::nextFloat(2 * PI));
+  setSpeed(Random::nextFloat(8, 10));
+}
+
+void Asteroid::generateForm()
+{
+  _points.clear();
+  int n = Random::nextInt(7, 15);
+
+  float radius = Random::nextFloat(5, 8);
+  float dAngle = .25 / n * 2 * PI; //angle dispersion
+  float dRadius = radius * 0.1; //radius dispersion
+
+  for(int i=0;i<n;i++)
+  {
+    float angle = static_cast<float>(i) / n * 2 * PI;
+    angle += Random::nextFloat(-dAngle, dAngle);
+
+    _points.push_back(Point(0, radius + Random::nextFloat(-dRadius, dRadius)).rotate(angle));
+  }
+}
+
+void Asteroid::draw(Render& render)
+{
+  std::vector<Point> points(_points);
+
+  for(int i=0;i<points.size();i++)
+    points[i] += center();
+
+  render.drawNAngle(Render::GRAY, points);
+
+/*
+  render.drawQuad(Render::GRAY, 
+		  center() + Vector(-3, -3), 
+		  center() + Vector(-3, 3), 
+		  center() + Vector(3, 3), 
+		  center() + Vector(3, -3));*/
+}

@@ -9,6 +9,17 @@ Game::Game()
   _moveTimer.reset();
 }
 
+void Game::setup(int width, int height)
+{
+  setupAsteroids(width, height);
+}
+
+void Game::setupAsteroids(int width, int height)
+{
+  for(int i=0; i<3;i++)
+    _asteroids.push_back(Asteroid(width, height));
+}
+
 void Game::tap(Point point)
 {
   if(_shootTimer.elapsed() < shootDelay)
@@ -44,6 +55,14 @@ void Game::update(Timer& timer, int width, int height)
 {
   _ship.update(timer, width, height);
 
+  for(int i=0;i<_asteroids.size();i++)
+  {
+    if(!_asteroids[i].update(timer, width, height))
+    {
+      _asteroids[i] = Asteroid(width, height);
+    }
+  }
+
   for(int i=0;i<_shoots.size();i++)
   {
     if(!_shoots[i].update(timer, width, height))
@@ -58,6 +77,9 @@ void Game::update(Timer& timer, int width, int height)
 void Game::draw(Render& render)
 {
   _ship.draw(render);
+
+  for(int i=0;i<_asteroids.size();i++)
+    _asteroids[i].draw(render);
 
   for(int i=0;i<_shoots.size();i++)
     _shoots[i].draw(render);

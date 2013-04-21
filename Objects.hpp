@@ -22,6 +22,7 @@ namespace Asteroids
     double speed() const;
 
     virtual bool update(const Timer& timer, int width, int height);
+    virtual void draw(Render& render) = 0;
 
   protected:
     void setPersistent(bool value);
@@ -68,6 +69,23 @@ namespace Asteroids
   private:
     static const float _lifeTime = 1;
     static const float _speed = 60;
+
+  };
+
+  class Asteroid: public Object
+  {
+  public:
+    Asteroid();
+    Asteroid(int width, int height);
+
+    void draw(Render& render);
+
+  private:
+    void generatePosition(int width, int height);
+    void generateSpeed();
+    void generateForm();
+
+    std::vector<Point> _points;
 
   };
 }

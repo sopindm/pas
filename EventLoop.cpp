@@ -22,6 +22,8 @@ void EventLoop::setup()
   _render.reset(new Render(_window.width(), _window.height()));
   _render->setup();
 
+  _game.setup(_render->width(), _render->height());
+
   _timer.start();
 }
 

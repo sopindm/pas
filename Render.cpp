@@ -64,6 +64,11 @@ Render::_RGBColor Render::toRGB(Color color)
   {
   case BLACK:
     return ret;
+  case GRAY:
+    ret.r = 0.6;
+    ret.g = 0.6;
+    ret.b = 0.6;
+    return ret;
   case WHITE:
     ret.r = 1;
     ret.g = 1;

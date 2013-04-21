@@ -1,9 +1,10 @@
+#include "Random.hpp"
 #include "EventLoop.hpp"
-
-#include <iostream>
 
 int main ( int argc, char * argv[] )
 {
+  Asteroids::Random::setup();
+
   Asteroids::EventLoop loop;
   loop.setup();
 
