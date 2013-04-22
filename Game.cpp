@@ -7,11 +7,18 @@ Game::Game()
 {
   _shootTimer.reset();
   _moveTimer.reset();
+  _isActive = false;
 }
 
 void Game::setup(int width, int height)
 {
   reset(width, height, 0);
+  _isActive = true;
+}
+
+bool Game::isActive() const
+{
+  return _isActive;
 }
 
 void Game::reset(int width, int height, int level)

@@ -40,7 +40,7 @@ namespace Asteroids
     void drawTriangle(Color color, Point p1, Point p2, Point p3);
     void drawQuad(Color color, Point p1, Point p2, Point p3, Point p4);
   
-    void drawNAngle(Color color, std::vector<Point> vertices);
+    void drawNAngle(Color color, const std::vector<Point>& vertices);
 
     static const int screenSize = 60;
 
@@ -52,6 +52,8 @@ namespace Asteroids
     Point toGLSpace(Point p) const;
 
     void setVertex(Point point);
+
+    void pushPoint(const Point& point, std::vector<float>& vertices);
 
     android_app* _app;
 

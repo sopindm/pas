@@ -13,6 +13,8 @@ namespace Asteroids
 
     void setup(int width, int height);
 
+    bool isActive() const;
+
     void update(Timer& timer, int width, int height);
     void draw(Render& render);
 
@@ -36,6 +38,8 @@ namespace Asteroids
 
     const static float shootDelay = 0.3;
     const static float moveDelay = 0.5;
+
+    bool _isActive;
 
     Ship _ship;
     std::vector<Shoot> _shoots;

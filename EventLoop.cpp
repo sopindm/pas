@@ -53,31 +53,32 @@ void EventLoop::onPaint()
 
 void EventLoop::onActivate()
 {
-  _game.setup(_render->width(), _render->height());
-
-  _render.setup();
+	_render.setup();
 	
-  if(_timer.isPaused())
-    _timer.resume();
-  else _timer.reset();
+	if(!_game.isActive())
+		_game.setup(_render.width(), _render.height());
 
-  _active = true;	
+	if(_timer.isPaused())
+	  _timer.resume();
+	else _timer.reset();
+
+	_active = true;	
 }
 
 void EventLoop::onDeactivate()
 {
-  _active = false;
-  _render.release();
-  _timer.pause();
+	_active = false;
+	_render.release();
+	_timer.pause();
 }
 
 void EventLoop::run()
 {
-  app_dummy();
+	app_dummy();
 
-  while(true)
-  {
-    if(_window.handleEvent())
-      break;
-  }
+	while(true)
+	{
+		if(_window.handleEvent())
+			break;
+	}
 }

@@ -231,10 +231,10 @@ void Asteroid::generateForm(float minRadius, float maxRadius)
 
 void Asteroid::draw(Render& render)
 {
-  std::vector<Point> points(_points);
+  std::vector<Point> points(0);
 
-  for(int i=0;i<points.size();i++)
-    points[i] += center();
+  for(int i=0;i<_points.size();i++)
+    points.push_back(center() + _points[i]);
 
   render.drawNAngle(Render::GRAY, points);
 }
@@ -292,10 +292,12 @@ void Asteroid::divide(std::vector<Asteroid>& collection)
     newAsteroid._size = _size - 1;
 
     Point position = center() + Vector(0, radius).rotate(angle);
-    newAsteroid.generatePosition(position.x, position.x, position.y, position.y, false);
+    newAsteroid.generatePosition(position.x, position.x, position.y, position.y);
     newAsteroid.generateSpeed(defaultMinSpeed, defaultMaxSpeed, angle - dAngle, angle + dAngle);
     newAsteroid.generateForm(radius, radius);
 
     collection.push_back(newAsteroid);
   }
+
+
 }
