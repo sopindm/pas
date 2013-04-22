@@ -292,12 +292,10 @@ void Asteroid::divide(std::vector<Asteroid>& collection)
     newAsteroid._size = _size - 1;
 
     Point position = center() + Vector(0, radius).rotate(angle);
-    newAsteroid.generatePosition(position.x, position.x, position.y, position.y);
+    newAsteroid.generatePosition(position.x, position.x, position.y, position.y, false);
     newAsteroid.generateSpeed(defaultMinSpeed, defaultMaxSpeed, angle - dAngle, angle + dAngle);
     newAsteroid.generateForm(radius, radius);
 
     collection.push_back(newAsteroid);
   }
-
-
 }
