@@ -31,40 +31,40 @@ float Render::height() const
 
 void Render::setupWindow()
 {
-	if(_display != EGL_NO_DISPLAY)
-		return;
+  if(_display != EGL_NO_DISPLAY)
+    return;
 
-	const EGLint attributes[] = {EGL_RENDERABLE_TYPE,
-				                 EGL_OPENGL_ES_BIT,
-				                 EGL_BLUE_SIZE, 5,
-				                 EGL_GREEN_SIZE, 6,
-				                 EGL_RED_SIZE, 5,
-				                 EGL_SURFACE_TYPE,
-				                 EGL_WINDOW_BIT,
-				                 EGL_NONE};
+  const EGLint attributes[] = {EGL_RENDERABLE_TYPE,
+			       EGL_OPENGL_ES_BIT,
+			       EGL_BLUE_SIZE, 5,
+			       EGL_GREEN_SIZE, 6,
+			       EGL_RED_SIZE, 5,
+			       EGL_SURFACE_TYPE,
+			       EGL_WINDOW_BIT,
+			       EGL_NONE};
 
-	_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	eglInitialize(_display, NULL, NULL);
+  _display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+  eglInitialize(_display, NULL, NULL);
 
-	EGLConfig config;
-	EGLint numConfigs;
-	eglChooseConfig(_display, attributes, &config, 1, &numConfigs);
+  EGLConfig config;
+  EGLint numConfigs;
+  eglChooseConfig(_display, attributes, &config, 1, &numConfigs);
 
-	EGLint format;
-	eglGetConfigAttrib(_display, config, EGL_NATIVE_VISUAL_ID, &format);
-	ANativeWindow_setBuffersGeometry(_app->window, 0, 0, format);
+  EGLint format;
+  eglGetConfigAttrib(_display, config, EGL_NATIVE_VISUAL_ID, &format);
+  ANativeWindow_setBuffersGeometry(_app->window, 0, 0, format);
 
-	_surface = eglCreateWindowSurface(_display, config, _app->window, NULL);
-	_context = eglCreateContext(_display, config, EGL_NO_CONTEXT, NULL);
+  _surface = eglCreateWindowSurface(_display, config, _app->window, NULL);
+  _context = eglCreateContext(_display, config, EGL_NO_CONTEXT, NULL);
 
-	eglMakeCurrent(_display, _surface, _surface, _context);
-	eglQuerySurface(_display, _surface, EGL_WIDTH, &_width);
-	eglQuerySurface(_display, _surface, EGL_HEIGHT, &_height);
+  eglMakeCurrent(_display, _surface, _surface, _context);
+  eglQuerySurface(_display, _surface, EGL_WIDTH, &_width);
+  eglQuerySurface(_display, _surface, EGL_HEIGHT, &_height);
 }
 
 void Render::setup()
 {
-	setupWindow();
+  setupWindow();
 
   glViewport(0, 0, _width, _height);
 
@@ -81,25 +81,25 @@ void Render::setup()
 
 void Render::release()
 {
-	if(_display == EGL_NO_DISPLAY)
-		return;
+  if(_display == EGL_NO_DISPLAY)
+    return;
 
-	eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+  eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
-	if(_context != EGL_NO_CONTEXT)
-	{
-		eglDestroyContext(_display, _context);
-		_context = EGL_NO_CONTEXT;
-	}
+  if(_context != EGL_NO_CONTEXT)
+  {
+    eglDestroyContext(_display, _context);
+    _context = EGL_NO_CONTEXT;
+  }
 
-	if(_surface != EGL_NO_SURFACE)
-	{
-		eglDestroySurface(_display, _surface);
-		_surface = EGL_NO_SURFACE;
-	}
+  if(_surface != EGL_NO_SURFACE)
+  {
+    eglDestroySurface(_display, _surface);
+    _surface = EGL_NO_SURFACE;
+  }
 
-	eglTerminate(_display);
-	_display = EGL_NO_DISPLAY;
+  eglTerminate(_display);
+  _display = EGL_NO_DISPLAY;
 }
 
 void Render::resize(int newWidth, int newHeight)
@@ -187,9 +187,8 @@ Point Render::fromScreenSpace(Point point) const
 
 void drawBuffer(GLenum mode, void* buffer, size_t size)
 {
-	glVertexPointer(3, GL_FLOAT, 0, buffer);
-	//glEnableVertexAttribArray(0);
-	glDrawArrays(mode, 0, size);
+  glVertexPointer(3, GL_FLOAT, 0, buffer);
+  glDrawArrays(mode, 0, size);
 }
 
 void Render::drawLine(Color color, Point p1, Point p2)
@@ -223,10 +222,10 @@ void Render::drawQuad(Color color, Point p1, Point p2, Point p3, Point p4)
 
 void Render::pushPoint(const Point& point, std::vector<float>& vertices)
 {
-	Point screenPoint = toGLSpace(point);
-	vertices.push_back(screenPoint.x);
-	vertices.push_back(screenPoint.y);
-	vertices.push_back(-1);
+  Point screenPoint = toGLSpace(point);
+  vertices.push_back(screenPoint.x);
+  vertices.push_back(screenPoint.y);
+  vertices.push_back(-1);
 }
 
 void Render::drawNAngle(Color color, const std::vector<Point>& vertices)
@@ -236,9 +235,9 @@ void Render::drawNAngle(Color color, const std::vector<Point>& vertices)
   std::vector<float> screenVertices;
   for(int i=1;i<vertices.size()-1;i++)
   {
-	pushPoint(vertices[0], screenVertices);
-	pushPoint(vertices[i], screenVertices);
-	pushPoint(vertices[i+1], screenVertices);
+    pushPoint(vertices[0], screenVertices);
+    pushPoint(vertices[i], screenVertices);
+    pushPoint(vertices[i+1], screenVertices);
   }
 
   drawBuffer(GL_TRIANGLES, &screenVertices[0], (vertices.size() - 2) * 3);

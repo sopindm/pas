@@ -12,9 +12,9 @@ Window::Window(android_app* app): _app(app),
 				  _sensorEventQueue(NULL),
 				  _configuration(app)
 {
-	_app->onAppCmd = activityCallback;
-	_app->onInputEvent = inputCallback;
-	_app->userData = pack();
+  _app->onAppCmd = activityCallback;
+  _app->onInputEvent = inputCallback;
+  _app->userData = pack();
 }
 
 void Window::release()
@@ -23,12 +23,12 @@ void Window::release()
 
 void* Window::pack()
 {
-	return this;
+  return this;
 }
 
 Window* Window::unpack(void* data)
 {
-	return reinterpret_cast<Window*>(data);
+  return reinterpret_cast<Window*>(data);
 }
 
 int Window::width() const
