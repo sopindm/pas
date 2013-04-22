@@ -30,21 +30,6 @@ namespace Asteroids
 
     void onExit();
 
-    void onStart(){};
-    void onResume(){};
-    void onPause(){};
-    void onStop(){};
-    void onDestroy(){};
-
-    void onSaveState(void** data, size_t* size){};
-    void onConfigChanged(){};
-    void onLowMemory(){};
-
-    void onCreateWindow(){};
-    void onDestroyWindow(){};
-    void onGainFocus(){};
-    void onLostFocus(){};
-
     Window _window;
     Render _render;
     Ship _ship;

@@ -1,7 +1,7 @@
 #ifndef ASTEROIDS_OBJECTS_HPP
 #define ASTEROIDS_OBJECTS_HPP
 
-#include "Types.hpp"
+#include "Geometry.hpp"
 #include "Render.hpp"
 #include "Timer.hpp"
 

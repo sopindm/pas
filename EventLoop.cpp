@@ -1,4 +1,3 @@
-#include "Logger.hpp"
 #include "EventLoop.hpp"
 
 using namespace Asteroids;

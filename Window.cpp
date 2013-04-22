@@ -1,4 +1,3 @@
-#include "Logger.hpp"
 #include "EventLoop.hpp"
 #include "Window.hpp"
 
@@ -215,45 +214,19 @@ void Window::processEvent(int32_t event)
 {
   switch(event)
   {
-  case APP_CMD_CONFIG_CHANGED:
-    _loop->onConfigChanged();
-    break;
-  case APP_CMD_INIT_WINDOW:
-    _loop->onCreateWindow();
-    break;
-  case APP_CMD_DESTROY:
-    _loop->onDestroy();
-    break;
   case APP_CMD_GAINED_FOCUS:
     activate();
-    _loop->onGainFocus();
     break;
   case APP_CMD_LOST_FOCUS:
-    _loop->onLostFocus();
     deactivate();
     break;
-  case APP_CMD_LOW_MEMORY:
-    _loop->onLowMemory();
-    break;
   case APP_CMD_PAUSE:
-    _loop->onPause();
     deactivate();
     break;
   case APP_CMD_RESUME:
     activate();
-    _loop->onResume();
-    break;
-  case APP_CMD_SAVE_STATE:
-    _loop->onSaveState(&_app->savedState, &_app->savedStateSize);
-    break;
-  case APP_CMD_START:
-    _loop->onStart();
-    break;
-  case APP_CMD_STOP:
-    _loop->onStop();
     break;
   case APP_CMD_TERM_WINDOW:
-    _loop->onDestroyWindow();
     deactivate();
     break;
   }

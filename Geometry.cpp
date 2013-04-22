@@ -1,6 +1,6 @@
 #include <cmath>
 #include <algorithm>
-#include "Types.hpp"
+#include "Geometry.hpp"
 
 using namespace Asteroids;
 

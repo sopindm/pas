@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_TYPES_HPP
-#define ASTEROIDS_TYPES_HPP
+#ifndef ASTEROIDS_GEOMETRY_HPP
+#define ASTEROIDS_GEOMETRY_HPP
 
 namespace Asteroids
 {
