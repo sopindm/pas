@@ -3,11 +3,11 @@
 
 namespace Asteroids
 {
-	class Logger
-	{
-	public:
-		static void message(const char* message);
-	};
+  class Logger
+  {
+  public:
+    static void message(const char* message);
+  };
 }
 
 #ifndef NDEBUG
